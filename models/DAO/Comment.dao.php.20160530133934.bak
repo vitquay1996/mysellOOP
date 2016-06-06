@@ -1,0 +1,69 @@
+<?php
+
+require_once 'DAO.php';
+
+/**
+/* Class CommentDAO
+*/
+abstract class CommentDAO extends EntityBase
+{
+  /**
+  /*  (PK)
+  /* @var int $comment.id
+   */
+  public $comment.id;
+
+  /**
+  /* 
+  /* @var text $comment.username
+   */
+  public $comment.username;
+
+  /**
+  /* 
+  /* @var int $comment.post_id
+   */
+  public $comment.post_id;
+
+  /**
+  /* 
+  /* @var text $comment.content
+   */
+  public $comment.content;
+
+  /**
+  /* 
+  /* @var date $comment.date
+   */
+  public $comment.date;
+
+
+  /**
+  /* Constructor
+  /* @var mixed $id
+   */
+  public function __construct($id=0)
+  {
+    parent::__construct();
+    $this->table='mysell_comments';
+    $this->primkeys=array('comment.id');
+    $this->fields=array('comment.username','comment.post_id','comment.content','comment.date');
+    $this->sql="SELECT * FROM {$this->table}";
+    if($id) $this->read($id);
+  }
+
+  /**
+  /* Primary Key Finder
+  /* @return object
+   */
+  public function findByComment.id($comment.id)
+  {
+    $sql="SELECT * FROM mysell_comments WHERE comment.id='$comment.id' LIMIT 1";
+    return $this->getSelfObject($sql);
+  }
+
+  // ==========!!!DO NOT PUT YOUR OWN CODE (BUSINESS LOGIC) HERE!!!==========
+  // EXTEND THIS DAO CLASS WITH YOUR ONW CLASS CONTAINING YOUR BUSINESS LOGIC
+  // BECAUSE THIS CLASS WILL BE !!RECREATED--OVERWRITTEN!! ON NEXT PHPDAO RUN
+}
+

@@ -1,0 +1,56 @@
+body
+{
+  color: #333;
+  font-size: 10pt;
+  font-family: sans-serif;
+  padding: 30px;
+}
+
+h1
+{
+  color: #888;
+  font-size: 32pt;
+}
+
+h2
+{
+  color: #555;
+  font-size: 24pt;
+}
+
+h3
+{
+  color: #333;
+  font-size: 18pt;
+}
+
+pre
+{
+  color: darkblue;
+  font-family: monospace;
+  font-size: 9pt;
+  padding: 8px;
+  background-color: #eee;
+}
+
+img
+{
+  display: block;
+  margin: auto;
+}
+
+table
+{
+  margin: auto;
+}
+
+td
+{
+  padding: 10px;
+  width: 400px;
+}
+
+p
+{
+  text-align: justify;
+}
