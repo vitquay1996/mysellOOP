@@ -5,6 +5,7 @@ ini_set('display_errors', 1);
 <?php include_once 'include/checkUser.php';
 include_once 'models/Post.php';
 include_once 'models/Upload.php';
+phpinfo();
 
 ?>
 <!DOCTYPE html>
