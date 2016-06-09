@@ -26,7 +26,7 @@ try
 
     $message = 'New user added! Please Sign In!';
     echo "<script type='text/javascript'>alert('$message');
-    window.location.replace(\"index.php\");</script>";
+    window.location.replace(\"signIn.php\");</script>";
 }
 catch(Exception $e)
 {
@@ -48,12 +48,3 @@ catch(Exception $e)
 }
 
 ?>
-
-<html>
-<head>
-    <title>PHPRO Login</title>
-</head>
-<body>
-    <p><?php echo $message; ?></p>
-</body>
-</html>
