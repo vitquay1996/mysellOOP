@@ -13,7 +13,7 @@ ini_set('display_errors', 1);
 
 <?php include_once 'include/checkAdmin.php';
 include_once 'models/Count.php';
-include_once 'models/dateCount.php';
+include_once 'models/DateCount.php';
 ?>
 
 <!DOCTYPE html>

@@ -13,7 +13,7 @@ if(isset($_POST['submit'])){
 //very basic validation
 	include_once 'include/checkPost.php';
 	$status = 1;
-	if (isset($error)){
+	if (!isset($error)){
 		//insert info into mysell_posts
 		try
 		{
@@ -45,9 +45,8 @@ if(isset($_POST['submit'])){
 		}
 	}
 	else{
-		foreach($error as $error){
-			echo '<p class="error">'.$error.'</p>';
-		}
+		header("Location: post.php?message=".$error);
+		exit;
 	}
 
 	//Check file

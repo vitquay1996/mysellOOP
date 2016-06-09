@@ -71,24 +71,36 @@ function addOrUpdateUrlParam($name, $value)
 						}
 					}
 				$iter = 1; //looping variable to make space between row
-				foreach ($Post as $Post1) {
+				//Pagination
+				$numEntry = count($Post);
+				$numPage = ceil($numEntry/12);
+				$numPostPerPage = 12; //set number of post per page here
+				if (isset($_GET['page'])) {
+					$iter2 = ($_GET['page'] - 1) * $numPostPerPage; 
+				}
+				else {
+					$_GET['page'] = 1;
+					$iter2 = 0;
+				}
+				$limit = $_GET['page']*$numPostPerPage;
+				while (($iter2 < $limit) && isset($Post[$iter2])) {	
 					if ($iter % 3 == 1) {?>
 					<div class="bottom-grid">
 						<?php }
 						$Upload = new Upload();
-						$Upload = $Upload->findByPostID($Post1->id);
+						$Upload = $Upload->findByPostID($Post[$iter2]->id);
 						?>
 						<div class="col-md-4 store-top">
 							<div class="bottom-grid-top">
-								<a href="userview.php?id=<?php echo $Post1->id;?>"><img class="img-responsive" src="images/<?php echo $Upload->id.'.'.$Upload->type;?>" alt="" >
-									<?php if ($Post1->status == 0) {?>
+								<a href="userview.php?id=<?php echo $Post[$iter2]->id;?>"><img class="img-responsive" src="images/<?php echo $Upload->id.'.'.$Upload->type;?>" alt="" >
+									<?php if ($Post[$iter2]->status == 0) {?>
 									<div class="five">
 										<h6 class="one">SOLD</h6>
 									</div>
 									<?php }?>
 									<div class="pre">
-										<p><?php echo $Post1->title;?></p>
-										<span><?php echo $Post1->price.' vnd';?></span>
+										<p><?php echo $Post[$iter2]->title;?></p>
+										<span><?php echo $Post[$iter2]->price.' vnd';?></span>
 										<div class="clearfix"> </div>
 									</div>
 								</a>
@@ -99,16 +111,13 @@ function addOrUpdateUrlParam($name, $value)
 					</div>
 					<?php }
 					$iter = $iter + 1;
+					$iter2++;
 				}
 
 				if (($iter % 3) != 1) {
 					echo '</div>';
-				}
-				
+				}				
 			}
-
-
-
 			catch(Exception $e)
 			{
 				/*** if we are here, something has gone wrong with the database ***/
@@ -117,9 +126,24 @@ function addOrUpdateUrlParam($name, $value)
 			}
 			?>
 			
+	</br>
+</br>
+</br>
+</br>
+	<ul class="start">
+		<?php for($i=1; $i<=$numPage; $i++) {
+			$url = addOrUpdateUrlParam('page', $i);
+			if ($i == $_GET['page']) { ?>
+			<li><span><?php echo $i;?></span></li>
+			<?php }
+			else { ?>
+			<li class="arrow"><a href="<?php echo $url?>"><?php echo $i;?></a></li>
+			<?php }
+		}?>
+	</ul>
 
-		</div>
 	</div>
+</div>
 	<div class="col-md-3 col-md">
 		<div class=" possible-about">
 			<h4>Sort Products</h4>
@@ -149,40 +173,7 @@ function addOrUpdateUrlParam($name, $value)
 
 			</div>
 			
-			<div class="tab4">
-				<ul class="place">
-
-					<li class="sort">Sort by <span>category</span> </li>
-					<li class="by"><img src="images/do.png" alt=""></li>
-					<div class="clearfix"> </div>
-				</ul>
-				<div class="single-bottom">
-
-
-					<a href="#">
-						<input type="checkbox"  id="up" value="">
-						<label for="up"><span></span><b>Upto 10%</b></label>
-					</a>
-					<a href="#">
-						<input type="checkbox"  id="up1" value="">
-						<label for="up1"><span></span> <b>10%-20%</b></label>
-					</a>
-					<a href="#">
-						<input type="checkbox"  id="up2" value="">
-						<label for="up2"><span></span> <b>20%-30%</b></label>
-					</a>
-					<a href="#">
-						<input type="checkbox"  id="up3" value="">
-						<label for="up3"><span></span> <b>30%-40%</b></label>
-					</a>
-					<a href="#">
-						<input type="checkbox"  id="up4" value="">
-						<label for="up4"><span></span><b>40%-50%</b></label>
-					</a>
-
-				</div>
-			</div>
-
+			
 
 			<!--script-->
 			<script>

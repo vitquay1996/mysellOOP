@@ -1,4 +1,4 @@
-<?php
+<?php include_once 'models/Category.php';
 ?>	
 
 <div class="container">
@@ -17,161 +17,77 @@
 		<div class="clearfix"> </div>
 	</div>
 	<div class="header-bottom">
-		<div class="top-nav">
+		
 
-			<ul class="megamenu skyblue">
-				<li class="active grid"><a  href="index.php?cat=001">For Him</a>
-					<div class="megapanel">
-						<div class="row">
-							<div class="col1">
-								<div class="h_nav">
-									<ul>
-										<li><a href="index.php?cat=005">Shirt</a></li>
-
-									</ul>	
-								</div>							
-							</div>
-
-							<div class="col1">
-								<div class="h_nav">
-									<h4>Popular Brands</h4>
-									<ul>
-										<li><a href="store.html">Levis</a></li>
-										<li><a href="index.php?catname=Lacoste">Lacoste</a></li>
-										<li><a href="store.html">Nike</a></li>
-										<li><a href="store.html">Edwin</a></li>
-										<li><a href="store.html">New Balance</a></li>
-										<li><a href="store.html">Jack & Jones</a></li>
-										<li><a href="store.html">Paul Smith</a></li>
-										<li><a href="store.html">Ray-Ban</a></li>
-										<li><a href="store.html">Wood Wood</a></li>
-									</ul>	
-								</div>												
-							</div>
-						</div>
-					</div>
-				</li>
-				<li class="active grid"><a  href="index.php">For Her</a>
-					<div class="megapanel">
-						<div class="row">
-							<div class="col1">
-								<div class="h_nav">
-									<ul>
-										<li><a href="store.html">Watches</a></li>
-
-									</ul>	
-								</div>							
-							</div>
-
-							<div class="col1">
-								<div class="h_nav">
-									<h4>Popular Brands</h4>
-									<ul>
-										<li><a href="store.html">Levis</a></li>
-										<li><a href="store.html">Persol</a></li>
-										<li><a href="store.html">Nike</a></li>
-										<li><a href="store.html">Edwin</a></li>
-										<li><a href="store.html">New Balance</a></li>
-										<li><a href="store.html">Jack & Jones</a></li>
-										<li><a href="store.html">Paul Smith</a></li>
-										<li><a href="store.html">Ray-Ban</a></li>
-										<li><a href="store.html">Wood Wood</a></li>
-									</ul>	
-								</div>												
-							</div>
-						</div>
-					</div>
-				</li>
-
-				<li class="grid"><a  href="#">Lifestyle Gadgets</a>
-					<div class="megapanel">
-						<div class="row">
-							<div class="col1">
-								<div class="h_nav">
-									<ul>
-										<li><a href="store.html">Accessories</a></li>
-
-									</ul>	
-								</div>							
-							</div>
-
-							<div class="col1">
-								<div class="h_nav">
-									<h4>Popular Brands</h4>
-									<ul>
-										<li><a href="store.html">Levis</a></li>
-										<li><a href="store.html">Persol</a></li>
-										<li><a href="store.html">Nike</a></li>
-										<li><a href="store.html">Edwin</a></li>
-										<li><a href="store.html">New Balance</a></li>
-										<li><a href="store.html">Jack & Jones</a></li>
-										<li><a href="store.html">Paul Smith</a></li>
-										<li><a href="store.html">Ray-Ban</a></li>
-										<li><a href="store.html">Wood Wood</a></li>
-									</ul>	
-								</div>												
-							</div>
-						</div>
-					</div>
-				</li>
-
-
-						<!-- <li class="grid"><a  href="#">Beauty Products</a>
-							<div class="megapanel">
-								<div class="row">
-									<div class="col1">
-										<div class="h_nav">
-											<ul>
-												<li><a href="store.html">Accessories</a></li>
-
-											</ul>	
-										</div>							
-									</div>
-
-									<div class="col1">
-										<div class="h_nav">
-											<h4>Popular Brands</h4>
-											<ul>
-												<li><a href="store.html">Levis</a></li>
-												<li><a href="store.html">Persol</a></li>
-												<li><a href="store.html">Nike</a></li>
-												<li><a href="store.html">Edwin</a></li>
-												<li><a href="store.html">New Balance</a></li>
-												<li><a href="store.html">Jack & Jones</a></li>
-												<li><a href="store.html">Paul Smith</a></li>
-												<li><a href="store.html">Ray-Ban</a></li>
-												<li><a href="store.html">Wood Wood</a></li>
-											</ul>	
-										</div>												
-									</div>
-								</div>
-							</div>
-						</li> -->
-
-					</ul> 
+		<ul class="nav navbar-nav navbar-left">
+			<li class="dropdown">
+				<a href="index.php?cat=001" class="dropbtn">For Him</a>
+				<div class="dropdown-content">
+					<?php
+					$Category = new Category();
+					$Category1 = $Category->findByParent('001');
+					foreach ($Category1 as $Category1) { ?>
+						<a href="index.php?cat=<?php echo $Category1->id2?>"><?php echo $Category1->name;?></a>
+					<?php }?>
 				</div>
-				<?php if (!isset($_SESSION['user_id'])): ?>
-				<ul class="nav navbar-nav navbar-right">
-					<a href="signin.php" class="btn btn-default" role="button">Sign In</a>
-					<li>
-						<a href="register.php">Sign up</a>
-					</li>
-				</ul>
-			<?php else: ?> 
-			<ul class="nav navbar-nav navbar-right">
-				<li>
-					<a href="user.php">Welcome <?php echo $User->username;?></a>
-				</li>
-				<?php if ($User->admin == 1) {?>
-				<a href="admin.php" class="btn btn-default" role="button">Admin</a>
-				<?php }?>
-				<a href="post.php" class="btn btn-default" role="button">New Post</a>
-				<a href="logout.php" class="btn btn-default" role="button">Sign Out</a>
-			</ul>
+			</li>
+			<li class="dropdown">
+				<a href="index.php?cat=002" class="dropbtn">For Her</a>
+				<div class="dropdown-content">
+					<?php
+					$Category2 = $Category->findByParent('002');
+					foreach ($Category2 as $Category2) { ?>
+						<a href="index.php?cat=<?php echo $Category2->id2?>"><?php echo $Category2->name;?></a>
+					<?php }?>
+				</div>
+			</li>
+			<li class="dropdown">
+				<a href="index.php?cat=003" class="dropbtn">Lifestyle Accesories</a>
+				<div class="dropdown-content">
+					<?php
+					$Category3 = $Category->findByParent('003');
+					foreach ($Category3 as $Category3) { ?>
+						<a href="index.php?cat=<?php echo $Category3->id2?>"><?php echo $Category3->name;?></a>
+					<?php }?>
+				</div>
+			</li>
+			
+			<li class="dropdown">
+				<a href="index.php?cat=004" class="dropbtn">Beauty Product</a>
+				<div class="dropdown-content">
+					<?php
+					$Category4 = $Category->findByParent('004');
+					foreach ($Category4 as $Category4) { ?>
+						<a href="index.php?cat=<?php echo $Category4->id2?>"><?php echo $Category4->name;?></a>
+					<?php }?>
+				</div>
+			</li>
+		</ul>
 
-		<?php endif;?>
 
-		<div class="clearfix"> </div>
-	</div>
-	<?php
-	?>
+		
+		<?php if (!isset($_SESSION['user_id'])): ?>
+		<ul class="nav navbar-nav navbar-right">
+			<a href="signIn.php" class="btn btn-default" role="button">Sign In</a>
+
+			<a href="signUp.php" class="btn btn-default" role="button">Sign up</a>
+		</ul>
+	<?php else: ?> 
+
+	<ul class="nav navbar-nav navbar-right">
+		<li>
+			<a href="user.php">Welcome <?php echo $User->username;?></a>
+		</li>
+		<?php if ($User->admin == 1) {?>
+		<a href="admin.php" class="btn btn-default" role="button">Admin</a>
+		<?php }?>
+		<a href="post.php" class="btn btn-default" role="button">New Post</a>
+		<a href="logout.php" class="btn btn-default" role="button">Sign Out</a>
+	</ul>
+
+<?php endif;?>
+
+<div class="clearfix"> </div>
+</div>
+<?php
+?>

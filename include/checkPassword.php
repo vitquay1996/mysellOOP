@@ -34,4 +34,9 @@ elseif (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
 {
     $message = "Invalid email";
 }
+if (isset($message)) {
+	$_GET['message']=$message;
+	header("Location: signUp.php?message=".$message);
+	exit;
+}
 ?>

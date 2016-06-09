@@ -1,21 +1,21 @@
 <?php	
-	if(`$postTitle` ==''){
-		$error[] = 'Please enter the title.';
+	if($title == ''){
+		$error = 'Please enter the title.';
 	}
 
-	if(`$postDescription` ==''){
-		$error[] = 'Please enter the description.';
+	elseif($description == ''){
+		$error = 'Please enter the description.';
 	}
 
-	if(`$postPrice` ==''){
-		$error[] = 'Please enter the price.';
+	elseif($price == ''){
+		$error = 'Please enter the price.';
 	}
 
-	if($category == ''){
-		$error[] = 'Please select category';
+	elseif($category == ''){
+		$error = 'Please select category';
 	}
 
-	if(!isset($_FILES)){
-		$error[]= 'Please upload an image';
+	elseif($_FILES["image"]["tmp_name"] == ''){
+		$error= 'Please upload an image';
 	}
 	?>

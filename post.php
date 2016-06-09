@@ -17,6 +17,11 @@ include_once 'models/Category.php';?>
 		<div class="col-sm-1">
 		</div>
 		<div class="col-sm-10">
+			<?php 
+				if (isset($_GET['message'])) {
+					echo $_GET['message'];
+				}
+				?>
 			<form action='postSubmit.php' method='post' enctype="multipart/form-data">
 
 				<p><label>Title</label><br />

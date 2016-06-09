@@ -2,7 +2,7 @@
 ini_set('display_errors', 1);
 ?>
 
-<?php include_once 'include/requireUser.php';
+<?php include_once 'include/checkUser.php';
 include_once 'models/Post.php';
 if(isset($_GET['delpost'])){ 
 	try
@@ -18,6 +18,13 @@ if(isset($_GET['delpost'])){
 
 	header('Location: user.php');
 	exit;
+}
+function addOrUpdateUrlParam($name, $value)
+{
+	$params = $_GET;
+	unset($params[$name]);
+	$params[$name] = $value;
+	return basename($_SERVER['PHP_SELF']).'?'.http_build_query($params);
 }
 ?>
 <!DOCTYPE html>
@@ -38,15 +45,34 @@ include_once 'models/Upload.php';
 			try
 			{
 				$Post = new Post();
-				$Post = $Post->findByUsername($User->username);
+				if (!isset($_GET['user'])) {
+					$Post = $Post->findByUsername($User->username);
+				}
+				else {
+					$Post = $Post->findByUsername($_GET['user']);
+				}
 				$iter = 1; //looping variable to make space between row
-				foreach ($Post as $Post1) {
+
+				//Pagination
+				$numEntry = count($Post);
+				$numPage = ceil($numEntry/12);
+				$numPostPerPage = 12; //set number of post per page here
+
+				if (isset($_GET['page'])) {
+					$iter2 = ($_GET['page'] - 1) * $numPostPerPage; 
+				}
+				else {
+					$_GET['page'] = 1;
+					$iter2 = 0;
+				}
+				$limit = $_GET['page']*$numPostPerPage;
+				while (($iter2 < $limit) && isset($Post[$iter2])) {	
 					if ($iter % 4 == 1) {?>
 					<div class="bottom-grid">
 						<?php }
 						try {
 							$Upload = new Upload();
-							$Upload = $Upload->findByPostID($Post1->id);
+							$Upload = $Upload->findByPostID($Post[$iter2]->id);
 						}
 						catch (Exception $e) {
 							echo "Yes error";
@@ -54,15 +80,15 @@ include_once 'models/Upload.php';
 						?>
 						<div class="col-md-3 store-top">
 							<div class="bottom-grid-top">
-								<a href="userview.php?id=<?php echo $Post1->id;?>"><img class="img-responsive" src="images/<?php echo $Upload->id.'.'.$Upload->type;?>" alt="" >
-									<?php if ($Post1->status == 0) {?>
+								<a href="userview.php?id=<?php echo $Post[$iter2]->id;?>"><img class="img-responsive" src="images/<?php echo $Upload->id.'.'.$Upload->type;?>" alt="" >
+									<?php if ($Post[$iter2]->status == 0) {?>
 									<div class="five">
 										<h6 class="one">SOLD</h6>
 									</div>
 									<?php }?>
 									<div class="pre">
-										<p><?php echo $Post1->title;?></p>
-										<span><?php echo $Post1->price.' vnd';?></span>
+										<p><?php echo $Post[$iter2]->title;?></p>
+										<span><?php echo $Post[$iter2]->price.' vnd';?></span>
 										<div class="clearfix"> </div>
 									</div>
 								</a>
@@ -73,6 +99,7 @@ include_once 'models/Upload.php';
 					</div>
 					<?php }
 					$iter = $iter + 1;
+					$iter2 = $iter2 +1;
 				}
 
 				if (($iter % 4) != 1) {
@@ -87,5 +114,27 @@ include_once 'models/Upload.php';
 			}
 			?>
 		</div>
-	</body>
-	</html>
+	</div>
+	</br>
+</br>
+</br>
+</br>
+<div class="container">
+	<ul class="start">
+		<?php for($i=1; $i<=$numPage; $i++) {
+			$url = addOrUpdateUrlParam('page', $i);
+			if ($i == $_GET['page']) { ?>
+			<li><span><?php echo $i;?></span></li>
+			<?php }
+			else { ?>
+			<li class="arrow"><a href="<?php echo $url?>"><?php echo $i;?></a></li>
+			<?php }
+		}?>
+	</ul>
+</div>
+<div class="footer">
+	<p class="footer-class">© 2015 Mihstore All Rights Reserved | Template by  <a href="http://w3layouts.com/" target="_blank">W3layouts</a> </p>
+	<div class="clearfix"> </div>
+</div>		
+</body>
+</html>

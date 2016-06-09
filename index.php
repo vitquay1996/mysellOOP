@@ -5,7 +5,14 @@ ini_set('display_errors', 1);
 <?php include_once 'include/checkUser.php';
 include_once 'models/Post.php';
 include_once 'models/Upload.php';
-// phpinfo();
+include_once 'models/NameCount.php';
+function addOrUpdateUrlParam($name, $value)
+{
+	$params = $_GET;
+	unset($params[$name]);
+	$params[$name] = $value;
+	return basename($_SERVER['PHP_SELF']).'?'.http_build_query($params);
+}
 
 ?>
 <!DOCTYPE html>
@@ -54,25 +61,53 @@ include_once 'models/Upload.php';
 			<div class="content-bottom">
 				<h3>Most Recent</h3>
 				<?php 
-				if ((!isset($_GET['cat'])) && (!isset($_GET['catname']))){ //IF there is no chosen category
 					try
 					{
 						$Post = new Post();
-						$Post = $Post->findEveryRecentPost();
+						if (!isset($_GET['cat']) && !isset($_GET['price'])) {
+							$Post = $Post->findEveryRecentPost();
+						}
+						else if (isset($_GET['cat']) && !isset($_GET['price'])) 
+						{
+							$Post = $Post->findByCat($_GET['cat']);
+						}
+						else if (!isset($_GET['cat']) && isset($_GET['price']))
+						{
+							$Post = $Post->findPrice($_GET['price']);
+						}
+						else if (isset($_GET['cat']) && isset($_GET['price'])) 
+						{
+							$Post = $Post->findByCatPrice($_GET['cat'], $_GET['price']);
+						}
+
 						$iter = 1; //looping variable to make space between row
-						foreach ($Post as $Post) {
-							if ($Post->status == 1) {
+
+						//Pagination
+						$numEntry = count($Post);
+						$numPage = ceil($numEntry/12);
+						$numPostPerPage = 12; //set number of post per page here
+
+						if (isset($_GET['page'])) {
+							$iter2 = ($_GET['page'] - 1) * $numPostPerPage; 
+						}
+						else {
+							$_GET['page'] = 1;
+							$iter2 = 0;
+						}
+						$limit = $_GET['page']*$numPostPerPage;
+						while (($iter2 < $limit) && isset($Post[$iter2])) {
+							if ($Post[$iter2]->status == 1) {
 								$Upload = new Upload();
-								$Upload = $Upload->findByPostID($Post->id);
+								$Upload = $Upload->findByPostID($Post[$iter2]->id);
 								if ($iter % 3 == 1) {?>
 								<div class="bottom-grid">
 									<?php }?>
 									<div class="col-md-4 shirt">
 										<div class="bottom-grid-top">
-											<a href="userview.php?id=<?php echo $Post->id;?>"><img class="img-responsive" src="images/<?php echo $Upload->id.'.'.$Upload->type;?>" alt="" >
+											<a href="userview.php?id=<?php echo $Post[$iter2]->id;?>"><img class="img-responsive" src="images/<?php echo $Upload->id.'.'.$Upload->type;?>" alt="" >
 												<div class="pre">
-													<p><?php echo $Post->title;?></p>
-													<span><?php echo $Post->price.' vnd';?></span>
+													<p><?php echo $Post[$iter2]->title;?></p>
+													<span><?php echo $Post[$iter2]->price.' vnd';?></span>
 													<div class="clearfix"> </div>
 												</div>
 											</a>
@@ -83,7 +118,14 @@ include_once 'models/Upload.php';
 								</div>
 								<?php }
 								$iter = $iter + 1;
+								
 							}
+							else {
+								$limit = $limit + 1;
+							}
+							$iter2 = $iter2 + 1;
+
+							
 						}
 						if (($iter % 3) != 1) {
 							echo '</div>';
@@ -98,108 +140,7 @@ include_once 'models/Upload.php';
 						$message = 'We are unable to process your request. Please try again later"';
 
 					}
-				}
-				else if (isset($_GET['cat'])){
-					try 
-					{
-						$Post = new Post();
-						$Post = $Post->findByCat($_GET['cat']);
-						$iter = 1; //looping variable to make space between row
-						foreach ($Post as $Post) {
-							if ($Post->status == 1) {
-								$Upload = new Upload();
-								$Upload = $Upload->findByPostId($Post->id);
-								if ($iter % 3 == 1) {?>
-								<div class="bottom-grid">
-									<?php }?>
-									<div class="col-md-4 shirt">
-										<div class="bottom-grid-top">
-											<a href="userview.php?id=<?php echo $Post->id?>"><img class="img-responsive" src="images/<?php echo $Upload->id.'.'.$Upload->type;?>" alt="" >
-												<div class="pre">
-													<p><?php echo $Post->title;?></p>
-													<span><?php echo $Post->price.' vnd';?></span>
-													<div class="clearfix"> </div>
-												</div>
-											</a>
-										</div>
-									</div>
-									<?php if ($iter % 3 == 0) {?>
-									<div class="clearfix"> </div>
-								</div>
-								<?php }
-								$iter = $iter + 1;
-							}
-						}
-						if (($iter % 3) != 1) {
-							echo '</div>';
-						}
-
-
-					}
-					catch(Exception $e)
-					{
-						/*** if we are here, something has gone wrong with the database ***/
-						echo $e->getMessage();
-
-					}
-
-
-
-
-				}
-				else if (isset($_GET['catname'])){
-					try 
-					{
-						$dbh = new PDO("mysql:host=$mysql_hostname;dbname=$mysql_dbname", $mysql_username, $mysql_password);
-
-						$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-						/*** prepare the select statement ***/
-						$stmt = $dbh->prepare("SELECT mysell_posts.`post.id`, mysell_posts.`post.title`, mysell_posts.`post.price`, mysell_posts.`post.status` FROM mysell_posts INNER JOIN mysell_cat ON mysell_posts.`post.cat_id`=mysell_cat.`cat_id` WHERE mysell_cat.`cat_name`=:catname ORDER BY `post.id` DESC");
-
-
-						$stmt->execute(array(':catname'=>$_GET['catname']));
-						$iter = 1; //looping variable to make space between row
-						while ($post = $stmt->fetch()) {
-							if ($post['post.status'] == 1) {
-								if ($iter % 3 == 1) {?>
-								<div class="bottom-grid">
-									<?php }?>
-									<div class="col-md-4 shirt">
-										<div class="bottom-grid-top">
-											<a href="userview.php?id=<?php echo $post['post.id'];?>"><img class="img-responsive" src="images/sh.png" alt="" >
-												<div class="pre">
-													<p><?php echo $post['post.title'];?></p>
-													<span><?php echo $post['post.price'].' vnd';?></span>
-													<div class="clearfix"> </div>
-												</div>
-											</a>
-										</div>
-									</div>
-									<?php if ($iter % 3 == 0) {?>
-									<div class="clearfix"> </div>
-								</div>
-								<?php }
-								$iter = $iter + 1;
-							}
-						}
-						if (($iter % 3) != 1) {
-							echo '</div>';
-						}
-
-
-					}
-					catch(Exception $e)
-					{
-						/*** if we are here, something has gone wrong with the database ***/
-						$message = 'We are unable to process your request. Please try again later"';
-
-					}
-
-
-
-
-				}
+				
 				?>
 				<div class="bottom-grid">
 
@@ -207,12 +148,15 @@ include_once 'models/Upload.php';
 				</div>
 			</div>
 			<ul class="start">
-				<li><span>1</span></li>
-				<li class="arrow"><a href="#">2</a></li>
-				<li class="arrow"><a href="#">3</a></li>
-				<li class="arrow"><a href="#">4</a></li>
-				<li class="arrow"><a href="#">5</a></li>
-				<li class="arrow"><a href="#">6</a></li>
+				<?php for($i=1; $i<=$numPage; $i++) {
+					$url = addOrUpdateUrlParam('page', $i);
+					if ($i == $_GET['page']) { ?>
+						<li><span><?php echo $i;?></span></li>
+					<?php }
+					else { ?>
+						<li class="arrow"><a href="<?php echo $url?>"><?php echo $i;?></a></li>
+					<?php }
+				}?>
 			</ul>
 		</div>
 
@@ -220,170 +164,26 @@ include_once 'models/Upload.php';
 			<div class=" possible-about">
 				<h4>Sort Products</h4>
 				<div class="tab1">
-					<ul class="place">
+				<ul class="place">
 
-						<li class="sort">Sort by <span>price</span></li>
-						<li class="by"><img src="images/do.png" alt=""></li>
-						<div class="clearfix"> </div>
-					</ul>
-					<div class="single-bottom">
+					<li class="sort">Sort by <span>price</span></li>
+					<li class="by"><img src="images/do.png" alt=""></li>
+					<div class="clearfix"> </div>
+				</ul>
+				<div class="single-bottom">
+					<?php
+					$url = addOrUpdateUrlParam('price', 'increase');
+					?>
+					<a href='<?php echo $url;?>'>
+						<label for="brand"><span></span><b>Increasing</b></label>
+					</a>
+					<?php 
+					$url = addOrUpdateUrlParam('price', 'decrease');
+					?>
+					<a href='<?php echo $url;?>'>
+						<label for="brand1"><span></span> <b>Decreasing</b></label>
+					</a>
 
-
-						<a href="#">
-							<input type="checkbox"  id="brand" value="">
-							<label for="brand"><span></span><b>Rs.3000-Rs.4000</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="brand1" value="">
-							<label for="brand1"><span></span> <b>Rs.3000-Rs.2000</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="brand2" value="">
-							<label for="brand2"><span></span> <b>Rs.2000-Rs.1000</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="brand3" value="">
-							<label for="brand3"><span></span> <b>Rs.1000-Rs.500</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="brand4" value="">
-							<label for="brand4"><span></span><b>Rs.500-below</b></label>
-						</a>
-
-					</div>
-
-				</div>
-				<div class="tab2">
-					<ul class="place">
-
-						<li class="sort">Sort by <span>brands</span></li>
-						<li class="by"><img src="images/do.png" alt=""></li>
-						<div class="clearfix"> </div>
-					</ul>
-
-					<div class="single-bottom">
-
-
-						<a href="#">
-							<input type="checkbox"  id="nike" value="">
-							<label for="nike"><span></span><b>Nike</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="nike1" value="">
-							<label for="nike1"><span></span> <b>Reebok</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="nike2" value="">
-							<label for="nike2"><span></span><b> Fila</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="nike3" value="">
-							<label for="nike3"><span></span> <b>Puma</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="nike4" value="">
-							<label for="nike4"><span></span><b>Sparx</b></label>
-						</a>
-					</div>
-
-				</div>
-				<div class="tab3">
-					<ul class="place">
-
-						<li class="sort">Sort by <span>colour</span> </li>
-						<li class="by"><img src="images/do.png" alt=""></li>
-						<div class="clearfix"> </div>
-					</ul>
-					<ul class="w_nav2">
-						<li><a class="color1" href="#"></a></li>
-						<li><a class="color2" href="#"></a></li>
-						<li><a class="color3" href="#"></a></li>
-						<li><a class="color4" href="#"></a></li>
-						<li><a class="color5" href="#"></a></li>
-						<li><a class="color6" href="#"></a></li>
-						<li><a class="color7" href="#"></a></li>
-						<li><a class="color8" href="#"></a></li>
-						<li><a class="color9" href="#"></a></li>
-						<li><a class="color10" href="#"></a></li>
-						<li><a class="color12" href="#"></a></li>
-						<li><a class="color13" href="#"></a></li>
-						<li><a class="color14" href="#"></a></li>
-						<li><a class="color15" href="#"></a></li>
-						<li><a class="color5" href="#"></a></li>
-						<li><a class="color6" href="#"></a></li>
-						<li><a class="color7" href="#"></a></li>
-						<li><a class="color8" href="#"></a></li>
-						<li><a class="color9" href="#"></a></li>
-						<li><a class="color10" href="#"></a></li>
-					</ul>
-				</div>
-				<div class="tab4">
-					<ul class="place">
-
-						<li class="sort">Sort by <span>discount</span> </li>
-						<li class="by"><img src="images/do.png" alt=""></li>
-						<div class="clearfix"> </div>
-					</ul>
-					<div class="single-bottom">
-
-
-						<a href="#">
-							<input type="checkbox"  id="up" value="">
-							<label for="up"><span></span><b>Upto 10%</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="up1" value="">
-							<label for="up1"><span></span> <b>10%-20%</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="up2" value="">
-							<label for="up2"><span></span> <b>20%-30%</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="up3" value="">
-							<label for="up3"><span></span> <b>30%-40%</b></label>
-						</a>
-						<a href="#">
-							<input type="checkbox"  id="up4" value="">
-							<label for="up4"><span></span><b>40%-50%</b></label>
-						</a>
-
-					</div>
-				</div>
-				<div class="tab5">
-					<ul class="place">
-
-						<li class="sort">Sort by <span>rating</span> </li>
-						<li class="by"><img src="images/do.png" alt=""></li>
-						<div class="clearfix"> </div>
-					</ul>
-					<div class="star-at">
-						<div class="two">
-							<a href="#"> <i></i>  </a>	
-							<a href="#"> <i></i>  </a>
-							<a href="#"> <i></i>  </a>
-							<a href="#"> <i></i>  </a>
-							<a href="#"> <i></i>  </a>
-						</div>
-						<div class="two">
-							<a href="#"> <i></i>  </a>	
-							<a href="#"> <i></i>  </a>
-							<a href="#"> <i></i>  </a>
-							<a href="#"> <i></i>  </a>
-
-						</div>
-						<div class="two">
-							<a href="#"> <i></i>  </a>	
-							<a href="#"> <i></i>  </a>
-							<a href="#"> <i></i>  </a>
-
-						</div>
-						<div class="two">
-							<a href="#"> <i></i>  </a>	
-							<a href="#"> <i></i>  </a>
-
-						</div>
-					</div>
 
 				</div>
 
@@ -436,62 +236,25 @@ include_once 'models/Upload.php';
 </div>
 <div class="content-bottom-grid">
 	<h3>Best Sellers</h3>
+	
+		<?php 
+			$Name = new NameCount();
+			$Name = $Name->bestSeller();
+			$iter = 0;
+			while ($iter<3 && isset($Name[$iter])) {
+			?>
 	<div class="latest-grid">
-		<div class="news">
-			<a href="single.html"><img class="img-responsive" src="images/si.jpg" title="name" alt=""></a>
-		</div>
 		<div class="news-in">
-			<h6><a href="single.html">Product name here</a></h6>
-			<p>Description Lorem ipsum </p>
+			<h6><a href="user.php?user=<?php echo $Name[$iter]->username?>"><?php echo $Name[$iter]->username;?></a></h6>
 			<ul>
-				<li>Price: <span>$110</span> </li><b>|</b>
-				<li>Country: <span>US</span></li>
+				<li>Sold: <span><?php echo $Name[$iter]->count;?></span> </li><b>|</b>
 			</ul>
 		</div>
 		<div class="clearfix"> </div>
 	</div>
-	<div class="latest-grid">
-		<div class="news">
-			<a href="single.html"><img class="img-responsive" src="images/si1.jpg" title="name" alt=""></a>
-		</div>
-		<div class="news-in">
-			<h6><a href="single.html">Product name here</a></h6>
-			<p>Description Lorem ipsum </p>
-			<ul>
-				<li>Price: <span>$110</span> </li><b>|</b>
-				<li>Country: <span>US</span></li>
-			</ul>
-		</div>
-		<div class="clearfix"> </div>
-	</div>
-	<div class="latest-grid">
-		<div class="news">
-			<a href="single.html"><img class="img-responsive" src="images/si.jpg" title="name" alt=""></a>
-		</div>
-		<div class="news-in">
-			<h6><a href="single.html">Product name here</a></h6>
-			<p>Description Lorem ipsum</p>
-			<ul>
-				<li>Price: <span>$110</span> </li><b>|</b>
-				<li>Country: <span>US</span></li>
-			</ul>
-		</div>
-		<div class="clearfix"> </div>
-	</div>
-	<div class="latest-grid">
-		<div class="news">
-			<a href="single.html"><img class="img-responsive" src="images/si1.jpg" title="name" alt=""></a>
-		</div>
-		<div class="news-in">
-			<h6><a href="single.html">Product name here</a></h6>
-			<p>Description Lorem ipsum </p>
-			<ul>
-				<li>Price: <span>$110</span> </li><b>|</b>
-				<li>Country: <span>US</span></li>
-			</ul>
-		</div>
-		<div class="clearfix"> </div>
-	</div>
+	<?php
+		$iter = $iter +1;
+	}?>
 </div>
 <!---->
 <div class="money">
@@ -515,8 +278,6 @@ include_once 'models/Upload.php';
 <!---->
 <div class="footer">
 	<p class="footer-class">© 2015 Mihstore All Rights Reserved | Template by  <a href="http://w3layouts.com/" target="_blank">W3layouts</a> </p>
-
-	<a href="#home" class="scroll to-Top" >  GO TO TOP!</a>
 	<div class="clearfix"> </div>
 </div>	 	
 </div>

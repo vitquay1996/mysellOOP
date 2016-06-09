@@ -8,13 +8,13 @@
 .megamenu>li.active>a{color:#00405d;}
 .megamenu>li.right{float:right}
 .megamenu .dropdown,.megamenu .dropdown li .dropdown{list-style:none;margin:0;padding:0;display:none;position:absolute;z-index:999;width:160px;border:solid 1px rgba(0,0,0,0.1);background:#fff}
-.megamenu .dropdown{top:59px}
+.megamenu .dropdown{top:63px}
 .megamenu .dropdown li .dropdown{left:160px;top:inherit}
 .megamenu .dropdown li{clear:both;width:100%;border-bottom:solid 1px rgba(0,0,0,0.1)}
 .megamenu .dropdown li:last-child{border-bottom:0}
 .megamenu .dropdown li a{float:left;width:100%;padding:10px 25px;text-decoration:none;display:block;border:0 none;font-size:14px;color:#444;background:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;transition:color .4s ease-in-out;-moz-transition:color .4s ease-in-out;-webkit-transition:color .4s ease-in-out;-o-transition:color .4s ease-in-out}
 .megamenu .dropdown li:hover>a{background:#dbdbdb}
-.megamenu>li>.megapanel{position:absolute;display:none;background:#ffffff;box-shadow: 0px 2px 4px #777;   opacity: 1 !important; border: 1px solid #CECCCC; width:100%;top:60px;left:-28px;z-index:9999;padding:20px 30px 20px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+.megamenu>li>.megapanel{position:absolute;display:none;background:#ffffff;box-shadow: 0px 0px 0px #777;   opacity: 1 !important; border: 1px solid #CECCCC; width:20%;top:60px;left:-28px;z-index:9999;padding:20px 30px 20px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
 .megamenu .megapanel ul{margin:0;padding:0}
 .megamenu .megapanel img{width:100%;border:solid 1px #dedede;cursor:pointer;-webkit-transition:border .3s linear;-moz-transition:border .3s linear;-o-transition:border .3s linear;transition:border .3s linear}.megamenu .megapanel img:hover{border:solid 1px #777}.megamenu form.contact input,.megamenu form.contact textarea{font-family:Calibri,Arial;font-size:16px;color:#444;outline:0}
 .megamenu form.contact input[type="text"],

@@ -17,6 +17,72 @@
 	<!--fonts-->
 	<link href='http://fonts.googleapis.com/css?family=Cabin:400,500,600,700' rel='stylesheet' type='text/css'>
 	<!--//fonts-->
+	<style>
+.dropbtn {
+    background-color: white;
+    color: black;
+    padding: 20px;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+  z-index:10;
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+  z-index:10;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {background-color: white}
+
+.dropdown:hover .dropdown-content {
+  z-index:10;
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+  z-index:10;
+    background-color: white;
+}
+</style>
+<style>
+#SubProductRoad {
+    position: relative;
+    z-index: 1;
+}
+#SubProductRoad .road {
+    height: 27px;
+    margin: 7px 0 0 0;
+    position: relative;
+    z-index: 2;
+}
+#SubProductRoad .road a.lv1 {
+    font: normal 11px/25px Arial;
+    color: #333;
+    height: 27px;
+    display: inline-block;
+}
+#SubProductRoad a.arrow {
+    padding-left: 16px;
+    background: url(http://wetrek.vn/cms/display/Product/SubControls/Hoa/SubProductRoad/arrow.gif.ashx) no-repeat 6px 10px;
+}
+</style>
 	<!--//slider-script-->
 	<script>$(document).ready(function(c) {
 		$('.alert-close').on('click', function(c){

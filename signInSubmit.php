@@ -20,7 +20,9 @@ try
 	
 	if($UserID == false)
 	{
-		$message = 'Login Failed';
+		$message = 'Wrong email or password';
+		header("Location: signIn.php?message=".$message);
+		exit;
 	}
 	else
 	{
@@ -39,12 +41,3 @@ catch(Exception $e)
 }
 
 ?>
-
-<html>
-<head>
-	<title>PHPRO Login</title>
-</head>
-<body>
-	<p><?php echo $message; ?>
-	</body>
-	</html>
