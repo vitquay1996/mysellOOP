@@ -1,4 +1,7 @@
 <?php
+include '../models/User.php';
+$NewUser = new User();
+
 if(!isset( $_POST['name'], $_POST['username'], $_POST['password'], $_POST['email'], $_POST['form_token']))
 {
     $message = 'Please enter a valid username and password';
@@ -34,6 +37,13 @@ elseif (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
 {
     $message = "Invalid email";
 }
+elseif (!empty($NewUser->findByUsername($_POST['username']))) {
+    $message = "Username already exist!";
+}
+elseif (!empty($NewUser->findByEmail($_POST['email']))) {
+    $message = "Email has already been used!";
+}
+
 if (isset($message)) {
 	$_GET['message']=$message;
 	header("Location: signUp.php?message=".$message);
