@@ -61,31 +61,37 @@ function addOrUpdateUrlParam($name, $value)
 			<div class="content-bottom">
 				<h3>Most Recent</h3>
 				<?php 
-					try
+				try
+				{
+					$Post = new Post();
+					if (!isset($_GET['cat']) && !isset($_GET['price'])) {
+						$Post = $Post->findEveryRecentPost();
+					}
+					else if (isset($_GET['cat']) && !isset($_GET['price'])) 
 					{
-						$Post = new Post();
-						if (!isset($_GET['cat']) && !isset($_GET['price'])) {
-							$Post = $Post->findEveryRecentPost();
-						}
-						else if (isset($_GET['cat']) && !isset($_GET['price'])) 
-						{
-							$Post = $Post->findByCat($_GET['cat']);
-						}
-						else if (!isset($_GET['cat']) && isset($_GET['price']))
-						{
-							$Post = $Post->findPrice($_GET['price']);
-						}
-						else if (isset($_GET['cat']) && isset($_GET['price'])) 
-						{
-							$Post = $Post->findByCatPrice($_GET['cat'], $_GET['price']);
-						}
+						$Post = $Post->findByCat($_GET['cat']);
+					}
+					else if (!isset($_GET['cat']) && isset($_GET['price']))
+					{
+						$Post = $Post->findPrice($_GET['price']);
+					}
+					else if (isset($_GET['cat']) && isset($_GET['price'])) 
+					{
+						$Post = $Post->findByCatPrice($_GET['cat'], $_GET['price']);
+					}
 
+					if (empty($Post)) { ?>
+					<div class="alert alert-warning">
+						<strong>Warning!</strong> There are currently no post here!
+					</div>
+					<?php } 
+					else {
 						$iter = 1; //looping variable to make space between row
 
 						//Pagination
 						$numEntry = count($Post);
-						$numPage = ceil($numEntry/12);
 						$numPostPerPage = 12; //set number of post per page here
+						$numPage = ceil($numEntry/$numPostPerPage);		
 
 						if (isset($_GET['page'])) {
 							$iter2 = ($_GET['page'] - 1) * $numPostPerPage; 
@@ -130,16 +136,17 @@ function addOrUpdateUrlParam($name, $value)
 						if (($iter % 3) != 1) {
 							echo '</div>';
 						}
-
-
-
 					}
-					catch(Exception $e)
-					{
-						/*** if we are here, something has gone wrong with the database ***/
-						$message = 'We are unable to process your request. Please try again later"';
 
-					}
+
+
+				}
+				catch(Exception $e)
+				{
+					/*** if we are here, something has gone wrong with the database ***/
+					$message = 'We are unable to process your request. Please try again later"';
+
+				}
 				
 				?>
 				<div class="bottom-grid">
@@ -148,14 +155,19 @@ function addOrUpdateUrlParam($name, $value)
 				</div>
 			</div>
 			<ul class="start">
-				<?php for($i=1; $i<=$numPage; $i++) {
-					$url = addOrUpdateUrlParam('page', $i);
-					if ($i == $_GET['page']) { ?>
-						<li><span><?php echo $i;?></span></li>
-					<?php }
-					else { ?>
-						<li class="arrow"><a href="<?php echo $url?>"><?php echo $i;?></a></li>
-					<?php }
+				<?php 
+				if (!empty($Post)) {
+					if ($numPage != 1) {
+						for($i=1; $i<=$numPage; $i++) {
+							$url = addOrUpdateUrlParam('page', $i);
+							if ($i == $_GET['page']) { ?>
+							<li><span><?php echo $i;?></span></li>
+							<?php }
+							else { ?>
+							<li class="arrow"><a href="<?php echo $url?>"><?php echo $i;?></a></li>
+							<?php }
+						}
+					}
 				}?>
 			</ul>
 		</div>
@@ -164,95 +176,95 @@ function addOrUpdateUrlParam($name, $value)
 			<div class=" possible-about">
 				<h4>Sort Products</h4>
 				<div class="tab1">
-				<ul class="place">
+					<ul class="place">
 
-					<li class="sort">Sort by <span>price</span></li>
-					<li class="by"><img src="images/do.png" alt=""></li>
-					<div class="clearfix"> </div>
-				</ul>
-				<div class="single-bottom">
-					<?php
-					$url = addOrUpdateUrlParam('price', 'increase');
-					?>
-					<a href='<?php echo $url;?>'>
-						<label for="brand"><span></span><b>Increasing</b></label>
-					</a>
-					<?php 
-					$url = addOrUpdateUrlParam('price', 'decrease');
-					?>
-					<a href='<?php echo $url;?>'>
-						<label for="brand1"><span></span> <b>Decreasing</b></label>
-					</a>
+						<li class="sort">Sort by <span>price</span></li>
+						<li class="by"><img src="images/do.png" alt=""></li>
+						<div class="clearfix"> </div>
+					</ul>
+					<div class="single-bottom">
+						<?php
+						$url = addOrUpdateUrlParam('price', 'increase');
+						?>
+						<a href='<?php echo $url;?>'>
+							<label for="brand"><span></span><b>Increasing</b></label>
+						</a>
+						<?php 
+						$url = addOrUpdateUrlParam('price', 'decrease');
+						?>
+						<a href='<?php echo $url;?>'>
+							<label for="brand1"><span></span> <b>Decreasing</b></label>
+						</a>
 
 
-				</div>
+					</div>
 
-				<!--script-->
-				<script>
-				$(document).ready(function(){
-					$(".tab1 .single-bottom").hide();
-					$(".tab2 .single-bottom").hide();
-					$(".tab3 .w_nav2").hide();
-					$(".tab4 .single-bottom").hide();
-					$(".tab5 .star-at").hide();
-					$(".tab1 ul").click(function(){
-						$(".tab1 .single-bottom").slideToggle(300);
+					<!--script-->
+					<script>
+					$(document).ready(function(){
+						$(".tab1 .single-bottom").hide();
 						$(".tab2 .single-bottom").hide();
 						$(".tab3 .w_nav2").hide();
 						$(".tab4 .single-bottom").hide();
 						$(".tab5 .star-at").hide();
-					})
-					$(".tab2 ul").click(function(){
-						$(".tab2 .single-bottom").slideToggle(300);
-						$(".tab1 .single-bottom").hide();
-						$(".tab3 .w_nav2").hide();
-						$(".tab4 .single-bottom").hide();
-						$(".tab5 .star-at").hide();
-					})
-					$(".tab3 ul").click(function(){
-						$(".tab3 .w_nav2").slideToggle(300);
-						$(".tab4 .single-bottom").hide();
-						$(".tab5 .star-at").hide();
-						$(".tab2 .single-bottom").hide();
-						$(".tab1 .single-bottom").hide();
-					})
-					$(".tab4 ul").click(function(){
-						$(".tab4 .single-bottom").slideToggle(300);
-						$(".tab5 .star-at").hide();
-						$(".tab3 .w_nav2").hide();
-						$(".tab2 .single-bottom").hide();
-						$(".tab1 .single-bottom").hide();
-					})	
-					$(".tab5 ul").click(function(){
-						$(".tab5 .star-at").slideToggle(300);
-						$(".tab4 .single-bottom").hide();
-						$(".tab3 .w_nav2").hide();
-						$(".tab2 .single-bottom").hide();
-						$(".tab1 .single-bottom").hide();
-					})	
-				});
+						$(".tab1 ul").click(function(){
+							$(".tab1 .single-bottom").slideToggle(300);
+							$(".tab2 .single-bottom").hide();
+							$(".tab3 .w_nav2").hide();
+							$(".tab4 .single-bottom").hide();
+							$(".tab5 .star-at").hide();
+						})
+						$(".tab2 ul").click(function(){
+							$(".tab2 .single-bottom").slideToggle(300);
+							$(".tab1 .single-bottom").hide();
+							$(".tab3 .w_nav2").hide();
+							$(".tab4 .single-bottom").hide();
+							$(".tab5 .star-at").hide();
+						})
+						$(".tab3 ul").click(function(){
+							$(".tab3 .w_nav2").slideToggle(300);
+							$(".tab4 .single-bottom").hide();
+							$(".tab5 .star-at").hide();
+							$(".tab2 .single-bottom").hide();
+							$(".tab1 .single-bottom").hide();
+						})
+						$(".tab4 ul").click(function(){
+							$(".tab4 .single-bottom").slideToggle(300);
+							$(".tab5 .star-at").hide();
+							$(".tab3 .w_nav2").hide();
+							$(".tab2 .single-bottom").hide();
+							$(".tab1 .single-bottom").hide();
+						})	
+						$(".tab5 ul").click(function(){
+							$(".tab5 .star-at").slideToggle(300);
+							$(".tab4 .single-bottom").hide();
+							$(".tab3 .w_nav2").hide();
+							$(".tab2 .single-bottom").hide();
+							$(".tab1 .single-bottom").hide();
+						})	
+					});
 </script>
 <!-- script -->
 </div>
 <div class="content-bottom-grid">
 	<h3>Best Sellers</h3>
 	
-		<?php 
-			$Name = new NameCount();
-			$Name = $Name->bestSeller();
-			$iter = 0;
-			while ($iter<3 && isset($Name[$iter])) {
-			?>
-	<div class="latest-grid">
-		<div class="news-in">
-			<h6><a href="user.php?user=<?php echo $Name[$iter]->username?>"><?php echo $Name[$iter]->username;?></a></h6>
-			<ul>
-				<li>Sold: <span><?php echo $Name[$iter]->count;?></span> </li><b>|</b>
-			</ul>
+	<?php 
+	$Name = new NameCount();
+	$Name = $Name->bestSeller();
+	$iter = 0;
+	while ($iter<3 && isset($Name[$iter])) {
+		?>
+		<div class="latest-grid">
+			<div class="news-in">
+				<h6><a href="user.php?user=<?php echo $Name[$iter]->username?>"><?php echo $Name[$iter]->username;?></a></h6>
+				<ul>
+					<li>Sold: <span><?php echo $Name[$iter]->count;?></span> </li><b>|</b>
+				</ul>
+			</div>
+			<div class="clearfix"> </div>
 		</div>
-		<div class="clearfix"> </div>
-	</div>
-	<?php
+		<?php
 		$iter = $iter +1;
 	}?>
 </div>
